@@ -75,7 +75,7 @@ conf_user() {
   chmod 711 /home/alarm
   mkdir -p /home/alarm/app
   mkdir -p /home/alarm/www
-  chown -R alarm:alarm app
+  chown -R alarm:alarm /home/alarm/app
   mkdir -p /home/alarm/.config
   chown alarm:alarm /home/alarm/.config
   conf_init_app
@@ -114,7 +114,7 @@ conf_weston() {
 
 conf_install_node() {
   su -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.1/install.sh | bash' - alarm
-  sudo pacman -S --needed --noconfirm npm nodejs
+  pacman -S --needed --noconfirm npm nodejs
   su -c 'mkdir -p /home/alarm/.npm-packages/bin' - alarm
   su -c 'npm config set prefix "~/.npm-packages"' - alarm
   su -c 'npm install express' - alarm
@@ -122,7 +122,7 @@ conf_install_node() {
   # npm and nodejs global modules
   export PATH="$PATH:$HOME/.npm-packages/bin"
   export NODE_PATH="$NODE_PATH:$HOME/.npm-packages/lib/node_modules"
-  ' >> .bashrc
+  ' >> /home/alarm/.bashrc
 }
 
 conf_install_80() {
