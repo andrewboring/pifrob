@@ -1,10 +1,23 @@
-
+#!/bin/sh
 
 # For saving orig system files.
 DATE=$(date +%Y%M%d)
 
 # Current supported is armv7 and aarch64.
 PLATFORM=$(uname -m)
+
+error() {
+  local parent_lineno="$1"
+  local message="$2"
+  local code="${3:-1}"
+  if [[ -n "$message" ]] ; then
+    echo "Error on or near line ${parent_lineno}: ${message}; exiting with status ${code}"
+  else
+    echo "Error on or near line ${parent_lineno}; exiting with status ${code}"
+  fi
+  exit "${code}"
+}
+trap 'error ${LINENO}' ERR
 
 
 
@@ -60,28 +73,12 @@ conf_init_app() {
   cp -R ../files/app/* /home/alarm/app
   chown -R alarm:alarm /home/alarm/app
   chmod +x /home/alarm/app/browse
+  su -c 'cd ~/app && npm install express' - alarm
 }
 
 conf_environment() {
   cp ../files/environment /home/alarm/.environment
   chown alarm:alarm /home/alarm/.environment
-}
-
-conf_user() {
-  echo "Setting up user..."
-  groupadd weston-launch
-  usermod -G wheel,video,weston-launch alarm
-  # Set up user stuff
-  chmod 711 /home/alarm
-  mkdir -p /home/alarm/app
-  mkdir -p /home/alarm/www
-  chown -R alarm:alarm /home/alarm/app
-  mkdir -p /home/alarm/.config
-  chown alarm:alarm /home/alarm/.config
-  conf_init_app
-  conf_sudo
-  conf_environment
-  conf_hushlogin
 }
 
 conf_xinitrc() {
@@ -117,7 +114,6 @@ conf_install_node() {
   pacman -S --needed --noconfirm npm nodejs
   su -c 'mkdir -p /home/alarm/.npm-packages/bin' - alarm
   su -c 'npm config set prefix "~/.npm-packages"' - alarm
-  su -c 'npm install express' - alarm
   echo '
   # npm and nodejs global modules
   export PATH="$PATH:$HOME/.npm-packages/bin"
@@ -154,20 +150,69 @@ conf_bootconfig_armv7() {
 conf_bootconfig_aarch64() {
   echo "Not yet implemented."
 }
+
+init_system() {
+  pi_init
+  pi_update
+  pi_install_pkgs
+}
+
+conf_system() {
+  conf_autologin
+  conf_install_80
+  conf_install_node
+  conf_bootconfig_armv7
+}
+
+conf_user() {
+  echo "Setting up user..."
+  groupadd weston-launch
+  usermod -G wheel,video,weston-launch alarm
+  # Set up user stuff
+  chmod 711 /home/alarm
+  mkdir -p /home/alarm/app
+  mkdir -p /home/alarm/www
+  chown -R alarm:alarm /home/alarm/app
+  mkdir -p /home/alarm/.config
+  chown alarm:alarm /home/alarm/.config
+  conf_sudo
+  conf_environment
+  conf_hushlogin
+  conf_weston
+  conf_init_app
+  conf_install_launcher
+}
+
+case $PLATFORM in
+  armv7l)
+    init_system
+    conf_system
+    conf_user
+    echo "All done. Rebooting now."
+    reboot
+    ;;
+  *)
+    echo "Sorry. The aarch64 platform is not yet implemented."
+    exit 1
+    ;;
+esac
+
 # Check PLATFORM
 # Run each of the commands:
 # - pi_init
 # - pi_update
 # - pi_install_pkgs
-# - conf_autologin
-# - conf_install_80
-
+# - conf_system
+#   - conf_autologin
+#   - conf_install_80
+#   - conf_install_node
+#   - conf_bootconfig_armv7
 # - conf_user
 #   - conf_init_app
 #   - conf_sudo
 #   - conf_environment
+#   - conf_weston
 #   - conf_hushlogin
-# - conf_weston
-# - conf_install_node
-# - conf_install_launcher
-# boot config!
+#   - conf_install_launcher
+#
+# reboot
