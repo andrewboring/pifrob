@@ -1,4 +1,4 @@
-DataPi - A Raspberry Pi-based kiosk / application development environment.
+PiFrob- A Raspberry Pi-based kiosk / application development environment.
 
 
 Features:
