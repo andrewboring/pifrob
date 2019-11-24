@@ -73,7 +73,7 @@ conf_init_app() {
   cp -R ../files/app/* /home/alarm/app
   chown -R alarm:alarm /home/alarm/app
   chmod +x /home/alarm/app/browse
-  su -c 'cd ~/app && npm install express' - alarm
+  su -c 'cd ~/app && npm init --yes && npm install express' - alarm
 }
 
 conf_environment() {
