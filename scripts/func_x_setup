@@ -1,0 +1,16 @@
+conf_xinitrc() {
+  # setup the xinitrc
+ echo '# avoid sleep
+ xset s off -dpms
+ # browse a generic page
+ app/browse --fullscreen file:///home/alarm/www/index.html' > /home/alarm/.xinitrc
+ chown alarm:alarm /home/alarm/.xinitrc
+}
+
+conf_setup_x() {
+  echo 'if [[ ! -d "/tmp/.X11-unix" ]]; then
+	 mkdir /tmp/.X11-unix
+  fi
+  #[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && exec startx > /dev/null 2>&1' >> /home/alarm/.bashrc
+  chown alarm:alarm /home/alarm/.bashrc
+}

@@ -1,0 +1,140 @@
+pi_init() {
+  pacman-key --init
+  pacman-key --populate archlinuxarm
+  mv /etc/pacman.d/mirrorlist /etc/pacmam.d/mirrorlist.${DATE}
+  #echo 'Server = http://fl.us.mirror.archlinuxarm.org/$arch/$repo' > /etc/pacman.d/mirrorlist
+  echo "'Server = https://update.a10g.com/current/$arch/$repo" > /etc/pacman.d/mirrorlist
+  echo "Pacman mirror configured."
+  cat /etc/pacman.d/mirrorlist
+}
+
+pi_update() {
+  echo "Updating the system. This may take a while..."
+  pacman -Syu --noconfirm
+}
+
+
+
+conf_autologin() {
+  echo "Configuring autologin for user alarm..."
+  mkdir -p /etc/systemd/system/getty@tty1.service.d
+  cat <<EOT >/etc/systemd/system/getty@tty1.service.d/autologin.conf
+[Service]
+ExecStart=
+ExecStart=-/usr/sbin/agetty -nia alarm %I
+EOT
+}
+
+conf_hushlogin() {
+  # avoid initial message
+  echo "Configuring hushlogin..."
+  touch /home/alarm/.hushlogin
+  chown alarm:alarm /home/alarm/.hushlogin
+}
+
+conf_sudo() {
+  echo "Configuring Sudo..."
+  pacman -S --needed --noconfirm sudo
+  mkdir -p /etc/sudoers.d
+  echo 'Defaults        lecture = never' > /etc/sudoers.d/warningoff || echo "Annoying first-time sudo warning not disabled."
+  #Use a password, or not. Your choice. Defaults to no password required for alarm user
+  #echo '%wheel ALL=(ALL) ALL' >> /etc/sudoers
+  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers || echo "Wheel group not configured for sudo."
+}
+
+conf_init_app() {
+  cp -R ../files/app/* /home/alarm/app
+  chown -R alarm:alarm /home/alarm/app
+  chmod +x /home/alarm/app/browse
+  su -c 'cd ~/app && npm init --yes && npm install express' - alarm
+}
+
+conf_environment() {
+  cp ../files/environment /home/alarm/.environment
+  chown alarm:alarm /home/alarm/.environment
+}
+
+conf_install_node() {
+  su -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.1/install.sh | bash' - alarm
+  pacman -S --needed --noconfirm npm nodejs
+  su -c 'mkdir -p /home/alarm/.npm-packages/bin' - alarm
+  su -c 'npm config set prefix "~/.npm-packages"' - alarm
+  echo '
+  # npm and nodejs global modules
+  export PATH="$PATH:$HOME/.npm-packages/bin"
+  export NODE_PATH="$NODE_PATH:$HOME/.npm-packages/lib/node_modules"
+  ' >> /home/alarm/.bashrc
+}
+
+conf_install_80() {
+  # configure 8080 to 80 redirect
+  echo '[Unit]
+  Description=port 80 to 8080 service
+  [Service]
+  Type=oneshot
+  RemainAfterExit=yes
+  ExecStart=/usr/bin/iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
+  ExecStart=/usr/bin/iptables -t nat -I OUTPUT -p tcp -o lo --dport 80 -j REDIRECT --to-port 8080
+  [Install]
+  WantedBy=multi-user.target
+  '>/etc/systemd/system/port80to8080.service
+  systemctl enable port80to8080.service
+}
+
+
+
+conf_install_launcher() {
+  cp ../files/launcher /home/alarm/.launcher
+  chown alarm:alarm /home/alarm/.launcher
+  chmod +x /home/alarm/.launcher
+}
+
+conf_weston() {
+  echo "Configuring Weston..."
+  cp ../files/weston.ini /home/alarm/.config/weston.ini
+  chown alarm:alarm /home/alarm/.config/weston.ini
+  echo '#/usr/bin/weston --log=weston.log
+  if [[ `tty` == "/dev/tty1" ]] ; then
+	 /usr/bin/weston-launch
+  fi' >> /home/alarm/.bashrc
+}
+
+
+
+
+init_system() {
+  pi_init
+  pi_update
+  pi_install_pkgs
+}
+
+conf_system() {
+  conf_autologin
+  conf_install_80
+  conf_install_node
+}
+
+conf_user() {
+  echo "Setting up user..."
+  groupadd weston-launch
+  usermod -G wheel,video,weston-launch alarm
+  # Set up user stuff
+  chmod 711 /home/alarm
+  mkdir -p /home/alarm/app
+  mkdir -p /home/alarm/www
+  chown -R alarm:alarm /home/alarm/app
+  mkdir -p /home/alarm/.config
+  chown alarm:alarm /home/alarm/.config
+  conf_sudo
+  conf_environment
+  conf_hushlogin
+  conf_weston
+  conf_init_app
+  conf_install_launcher
+}
+
+get_test_vid() {
+  VID_FILE="big_buck_bunny_720p_1mb.mp4"
+  VID_URL="https://"
+  cd /home/alarm && curl -O ${VID_URL}/${VID_FILE} && chown alarm:alarm ${VID_FILE}
+}
