@@ -2,7 +2,7 @@
 
 conf_weston() {
   echo "Configuring Weston..."
-  cp ../files/weston.ini /home/alarm/.config/weston.ini
+  cp ${DIR}/../files/weston.ini /home/alarm/.config/weston.ini
   chown alarm:alarm /home/alarm/.config/weston.ini
   echo '#/usr/bin/weston --log=weston.log
   if [[ `tty` == "/dev/tty1" ]] ; then
@@ -17,7 +17,7 @@ pi_install_pkgs() {
 
 conf_bootconfig_aarch64() {
   mv /boot/config.txt /boot/config.${DATE}
-  cp ../files/bootconfig-aarch64.txt /boot/config.txt
+  cp ${DIR}/../files/bootconfig-aarch64.txt /boot/config.txt
 }
 
 # build/install raspberrypi-kernel from AUR https://aur.archlinux.org/packages/linux-aarch64-raspberrypi-bin/
