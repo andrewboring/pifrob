@@ -24,7 +24,7 @@ fi
 # Some useful constants
 
 # Local directory to mount the image (automatically created/delete as needed)
-mount="mnt"
+mount="rpi"
 
 DIR=$(dirname $0)
 # Local setup script to run inside the image
@@ -48,11 +48,11 @@ file="ArchLinuxARM-${rpi}-latest.tar.gz"
 cleanup() {
     #[[ -f "${mount}/tmp/${script}" ]] && rm "${mount}/tmp/${script}"
     if [[ -d "${mount}" ]]; then
-        umount "${mount}/dev" || true
-        umount "${mount}/proc" || true
-        umount "${mount}/sys" || true
-        umount "${mount}/boot" || true
-        umount "${mount}" || true
+        umount --lazy "${mount}/dev" || true
+        umount --lazy "${mount}/proc" || true
+        umount --lazy "${mount}/sys" || true
+        umount --lazy "${mount}/boot" || true
+        umount --lazy "${mount}" || true
         rmdir "${mount}" || true
     fi
     [ -n "${loopdev}" ] && losetup --detach "${loopdev}" || true
