@@ -2,8 +2,8 @@ pi_init() {
   pacman-key --init
   pacman-key --populate archlinuxarm
   mv /etc/pacman.d/mirrorlist /etc/pacmam.d/mirrorlist.${DATE}
-  #echo 'Server = http://fl.us.mirror.archlinuxarm.org/$arch/$repo' > /etc/pacman.d/mirrorlist
-  echo "'Server = https://update.a10g.com/current/$arch/$repo" > /etc/pacman.d/mirrorlist
+  echo 'Server = http://fl.us.mirror.archlinuxarm.org/$arch/$repo' > /etc/pacman.d/mirrorlist
+  #echo 'Server = http://update.a10g.com/current/$arch/$repo' > /etc/pacman.d/mirrorlist
   echo "Pacman mirror configured."
   cat /etc/pacman.d/mirrorlist
 }
@@ -43,14 +43,14 @@ conf_sudo() {
 }
 
 conf_init_app() {
-  cp -R ../files/app/* /home/alarm/app
+  cp -R ${DIR}/../files/app/* /home/alarm/app
   chown -R alarm:alarm /home/alarm/app
   chmod +x /home/alarm/app/browse
   su -c 'cd ~/app && npm init --yes && npm install express' - alarm
 }
 
 conf_environment() {
-  cp ../files/environment /home/alarm/.environment
+  cp ${DIR}/../files/environment /home/alarm/.environment
   chown alarm:alarm /home/alarm/.environment
 }
 
@@ -78,20 +78,21 @@ conf_install_80() {
   [Install]
   WantedBy=multi-user.target
   '>/etc/systemd/system/port80to8080.service
-  systemctl enable port80to8080.service
+  #systemctl enable port80to8080.service
+  #chroot in build system requires manual symlinks
+  ln -sf /usr/lib/systemd/system/port80to8080.service /etc/systemd/system/multi-user.target.wants/
 }
 
 
-
 conf_install_launcher() {
-  cp ../files/launcher /home/alarm/.launcher
+  cp ${DIR}/../files/launcher /home/alarm/.launcher
   chown alarm:alarm /home/alarm/.launcher
   chmod +x /home/alarm/.launcher
 }
 
 conf_weston() {
   echo "Configuring Weston..."
-  cp ../files/weston.ini /home/alarm/.config/weston.ini
+  cp ${DIR}/../files/weston.ini /home/alarm/.config/weston.ini
   chown alarm:alarm /home/alarm/.config/weston.ini
   echo '#/usr/bin/weston --log=weston.log
   if [[ `tty` == "/dev/tty1" ]] ; then

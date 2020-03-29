@@ -12,7 +12,8 @@
 DATE=$(date +%Y%M%d)
 
 # Current supported is armv7 and aarch64.
-PLATFORM=$(uname -m)
+#PLATFORM=$(uname -m)
+PLATFORM="${1:-armv7l}"
 
 error() {
   local parent_lineno="$1"
@@ -27,26 +28,27 @@ error() {
 }
 trap 'error ${LINENO}' ERR
 
-source install-common
+DIR=$(dirname $0)
+source ${DIR}/install-common
 
 case $PLATFORM in
   armv7l)
-    source install-armv7l
+    source ${DIR}/install-armv7l
     init_system
     conf_system
     conf_bootconfig_armv7l
     conf_user
     echo "All done. Rebooting now."
-    reboot
+    exit 0
     ;;
-  armv7l)
-    source install-aarch64
+  aarch64)
+    source ${DIR}/install-aarch64
     init_system
     conf_system
     conf_bootconfig_aarch64
     conf_user
     echo "All done. Rebooting now."
-    reboot
+	exit 0
     ;;
   *)
     echo "Sorry. This platform is not yet implemented."
