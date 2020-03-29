@@ -24,10 +24,10 @@ Vagrant.configure("2") do |config|
 		#pacman -Syu
 		#pacman -S parted git base-devel qemu qemu-arch-extra --noconfirm
 		apt-get update && apt-get -y install rng-tools qemu qemu-user-static binfmt-support parted wget dosfstools zip systemd-container
-    	#/bin/bash build-scripts/create-image
-		#echo "If everything worked, you can execute:"
-		#echo "'vagrant scp build:/home/vagrant/pifrob-rpi-2-arm.img .'" 
-		#echo "to copy to your local machine."
+    	/bin/bash build-scripts/create-image
+		echo "If everything worked, you can execute:"
+		echo "'vagrant scp build:/home/vagrant/pifrob-rpi-2-arm.img .'" 
+		echo "to copy to your local machine."
     SHELL
   end
 end
