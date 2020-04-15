@@ -1,2 +1,4 @@
 .DS_Store
 assets
+vagrant/.vagrant
+.travis.yml
