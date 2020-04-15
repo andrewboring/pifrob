@@ -38,7 +38,7 @@ case $PLATFORM in
     conf_system
     conf_bootconfig_armv7l
     conf_user
-    echo "All done. Rebooting now."
+    echo "All done!"
     exit 0
     ;;
   aarch64)
@@ -47,7 +47,7 @@ case $PLATFORM in
     conf_system
     conf_bootconfig_aarch64
     conf_user
-    echo "All done. Rebooting now."
+    echo "All done!"
 	exit 0
     ;;
   *)

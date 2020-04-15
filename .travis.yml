@@ -1,0 +1,15 @@
+dist: bionic
+sudo: required
+addons:
+  apt:
+    packages:
+      - qemu
+      - qemu-user-static
+      - binfmt-support
+      - parted
+      - wget
+      - dosfstools
+      - zip
+script:
+  - sudo bash build-scripts/create-image
+  - zip pifrob-rpi-2-arm.img.zip pifrob-rpi-2-arm.img
