@@ -12,5 +12,4 @@ addons:
       - zip
 script:
   - sudo bash build-scripts/create-image
-  - xz -z  pifrob-rpi-2-arm.img -c > pifrob-rpi-2-arm.img.xz
   - zip pifrob-rpi-2-arm.img.zip pifrob-rpi-2-arm.img
