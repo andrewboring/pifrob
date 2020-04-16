@@ -15,6 +15,7 @@ script:
 - zip pifrob-rpi-2-arm.img.zip pifrob-rpi-2-arm.img
 deploy:
   provider: releases
+  skip_cleanup: true
   api_key:
     secure: sIXGM723THGURCBdwTQxhdpy9i7PM5njyKD6cqUU/JpU/KS0UInSFV2dlXl2eZ7d5pU9/bvfGBU0F4+pngUAfIOhLsewXsgeDbBKlch8vDP5ZDnsEoKmLFnD8R/lR1opiGxBdIDfk9aZmU57UunCqUyUyR6hzKomswYos3xRQYk97+pEsGrTp08KOhu6iH6pa5CIB8HYhFeC4OHZcW52t0VjW5wOhATSMCV9arQd8cPnR4UFZvEH+4ZyD9cUPtylPxKHHUN2VsfUzKK+KbV9zY8GeVu8+hMzQaXJ5B+bUKM0P65hoebGBGM4WuKwylgBpFoHNgdS/kvP6RD1bVTnPHBdHVmldQ+X3A3HCYgN3Epj2vSISF696OBG3B6HMUOvrdu/B1F7b+rmakppvUXXiKIrIgprbcrL8NkkNCFT9dZBtW4WOaC/+/0NkXDaHzXAspiMOQ/YHTbcmcps7Fksh047ZbKHgVQTEvqNVUkOB5PdyU6ICqGo6TkUULRBNjQGqNgZFjZgQJ6t91xwdMqPbTF9BjQl7s+GTptknxhG+MHfS2mTSrZ/p4LcPYAu2q5886eJ08c19RwLtuE3OifBqZrZdvbQHpjlJcnLOm9AHgtLwJ5wsoMlykt8SFRZFxKpfjRTL2LTEXtdKALf8RKpwbQL5/RbmShKHEEiHybPElU=
   file: pifrob-rpi-2-arm.img.zip
