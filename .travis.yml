@@ -20,4 +20,4 @@ deploy:
   file: pifrob-rpi-2-arm.img.zip
   on:
     repo: a10g/pifrob
-	tags: true
+    tags: true
